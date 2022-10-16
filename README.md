@@ -1,3 +1,17 @@
+# My modification for the project
+
+```bash
+# Server started first
+sudo ./vtun-linux-amd64 -S -l :3001 -c 172.16.0.1/24 -k 123456
+# Client:
+# This is for the command line. Vscode config is ready for debuging.
+sudo ./vtun-linux-amd64 -s server-addr:3001 -c 192.168.122.241/24 -k 123456
+```
+
+
+
+
+
 # vtun
 
 A simple VPN written in Go.
@@ -109,18 +123,20 @@ sudo ./vtun-linux-amd64 -S -l :3001 -c 172.16.0.1/24 -k 123456
 
 ```
   # Enable ipv4 and ipv6 forward
+  # sudo sh -c  "echo 1 > /proc/sys/net/ipv4/ip_forward"
+  # sudo sh -c  "echo 1 > /proc/sys/net/ipv6/ip_forward"
   vi /etc/sysctl.conf
   net.ipv4.ip_forward = 1
   net.ipv6.conf.all.forwarding=1
-  sysctl -p /etc/sysctl.conf
+  sudo sysctl -p /etc/sysctl.conf
   # Masquerade outgoing traffic
-  iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-  iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+  sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+  sudo iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
   # Allow return traffic
-  iptables -A INPUT -i eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT
-  iptables -A INPUT -i tun0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+  sudo iptables -A INPUT -i eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+  sudo iptables -A INPUT -i tun0 -m state --state RELATED,ESTABLISHED -j ACCEPT
   # Forward everything
-  iptables -A FORWARD -j ACCEPT
+  sudo iptables -A FORWARD -j ACCEPT
 
 ```
 
