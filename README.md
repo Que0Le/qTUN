@@ -2,10 +2,10 @@
 
 ```bash
 # Server started first
-sudo ./vtun-linux-amd64 -S -l :3001 -c 172.16.0.1/24 -k 123456
+sudo ./bin/vtun-linux-amd64 -S -l :3001 -c 172.16.0.1/24 -k 123456
 # Client:
 # This is for the command line. Vscode config is ready for debuging.
-sudo ./vtun-linux-amd64 -s server-addr:3001 -c 192.168.122.241/24 -k 123456
+sudo ./bin/vtun-linux-amd64 -s 192.168.122.241:3001 -c 172.16.0.10/24 -k 123456
 ```
 
 
