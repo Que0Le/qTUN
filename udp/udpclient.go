@@ -56,9 +56,10 @@ func StartClient(iface *water.Interface, config config.Config) {
 	/*  */
 	defer conn.Close()
 	log.Printf("vtun udp client started on %v", conn.LocalAddr().String())
+	localConnMP := []*net.UDPConn{conn1, conn2, conn3}
 	c := &Client{
-		config: config, iface: iface, localConn: conn, serverAddr: serverAddr,
-		localConnMP1: conn1, localConnMP2: conn2, localConnMP3: conn3,
+		config: config, iface: iface, localConn: conn,
+		serverAddr: serverAddr, localConnMP: localConnMP,
 	}
 	go c.udpToTun()
 	c.tunToUdp()
@@ -66,13 +67,13 @@ func StartClient(iface *water.Interface, config config.Config) {
 
 // The client struct
 type Client struct {
-	config       config.Config
-	iface        *water.Interface
-	localConn    *net.UDPConn
-	localConnMP1 *net.UDPConn
-	localConnMP2 *net.UDPConn
-	localConnMP3 *net.UDPConn
-	serverAddr   *net.UDPAddr
+	config      config.Config
+	iface       *water.Interface
+	localConn   *net.UDPConn
+	localConnMP []*net.UDPConn
+	// localConnMP2 *net.UDPConn
+	// localConnMP3 *net.UDPConn
+	serverAddr *net.UDPAddr
 }
 
 // udpToTun sends packets from udp to tun
@@ -117,15 +118,9 @@ func (c *Client) tunToUdp() {
 		if c.config.Compress {
 			b = snappy.Encode(nil, b)
 		}
-		rand := 1 + rand.Intn(3-1+1)
-		println(rand)
-		if rand == 1 {
-			c.localConnMP1.WriteToUDP(b, c.serverAddr)
-		} else if rand == 2 {
-			c.localConnMP2.WriteToUDP(b, c.serverAddr)
-		} else if rand == 3 {
-			c.localConnMP3.WriteToUDP(b, c.serverAddr)
-		}
+		rand_i := rand.Intn(len(c.localConnMP) - 1 + 1) // get a random connection
+		println(rand_i)
+		c.localConnMP[rand_i].WriteToUDP(b, c.serverAddr)
 		// c.localConn.WriteToUDP(b, c.serverAddr)
 		counter.IncrWrittenBytes(n)
 	}
